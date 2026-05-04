@@ -1,0 +1,74 @@
+﻿@model IEnumerable<SubscriptionWeb.Models.Plan>
+
+@{
+    ViewData["Title"] = "Мои тарифы";
+}
+
+<div class="container">
+    <!-- Баннер страницы -->
+    <div class="miku-card p-5 mb-5 position-relative overflow-hidden" style="background-color: var(--miku-mint-light); border-radius: 40px;">
+        <div class="position-relative" style="z-index: 2; max-width: 600px;">
+            <h1 class="display-4 fw-bold mb-3" style="color: var(--miku-dark);">ваши активные тарифы</h1>
+            <p class="fs-5 mb-4" style="color: var(--miku-dark); opacity: 0.8;">
+                Контролируйте расходы и управляйте периодами оплаты. Здесь собраны все детали ваших подписок.
+            </p>
+            <a asp-action="Create" class="btn-outline-dark-miku text-decoration-none">Создать тариф</a>
+        </div>
+        <div class="position-absolute" style="width: 350px; height: 350px; background: white; opacity: 0.15; border-radius: 50%; bottom: -100px; right: -50px; z-index: 1;"></div>
+    </div>
+
+    <h2 class="fw-bold mb-4" style="color: var(--miku-dark);">Управление планами ></h2>
+
+    @if (Model != null && Model.Any())
+    {
+        <div class="row g-4">
+            @foreach (var item in Model)
+            {
+                <div class="col-md-6 col-lg-4">
+                    <div class="miku-card p-4 shadow-sm border-0 position-relative">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <div>
+                                <span class="badge rounded-pill mb-1" style="background-color: var(--miku-mint-light); color: var(--miku-dark);">
+                                    @(item.Service?.Name ?? "Сервис")
+                                </span>
+                                <h4 class="fw-bold m-0" style="color: var(--miku-dark);">@item.PlanName</h4>
+                            </div>
+                            <div class="text-end">
+                                <h4 class="fw-bold m-0" style="color: var(--miku-mint);">@item.Price ₽</h4>
+                                <small class="text-muted">за @item.BillingDays дн.</small>
+                            </div>
+                        </div>
+
+                        <hr style="opacity: 0.05;">
+
+                        <div class="d-flex justify-content-between align-items-center mt-3">
+                            <div class="d-flex gap-2">
+                                <a asp-action="Edit" asp-route-id="@item.PlanId" class="btn-outline-dark-miku py-1 px-3 text-decoration-none" style="font-size: 0.85rem;">Edit</a>
+                                <form asp-action="Delete" asp-route-id="@item.PlanId" method="post" onsubmit="return confirm('Удалить этот тариф?')">
+                                    <button type="submit" class="border-0 d-flex justify-content-center align-items-center shadow-sm"
+                                            style="width: 32px; height: 32px; background-color: var(--miku-pink); color: white; border-radius: 10px;">
+                                        ✕
+                                    </button>
+                                </form>
+                            </div>
+
+                            @{
+                                var dailyCost = item.BillingDays > 0 ? Math.Round(item.Price / (decimal)item.BillingDays, 2) : 0;
+                            }
+                            <small class="text-muted">@dailyCost ₽/день</small>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <!-- ТА САМАЯ ЗАГЛУШКА -->
+        <div class="text-center py-5 rounded-4" style="background-color: var(--miku-bg); border: 2px dashed #ddd;">
+            <div class="fs-1 mb-3">💎</div>
+            <p class="text-muted m-0">У вас пока нет созданных тарифов. Самое время добавить первый!</p>
+            <a asp-action="Create" class="text-decoration-none fw-bold mt-2 d-inline-block" style="color: var(--miku-mint);">Создать сейчас</a>
+        </div>
+    }
+</div>

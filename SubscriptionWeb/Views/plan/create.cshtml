@@ -1,0 +1,73 @@
+﻿@model SubscriptionWeb.Models.Plan
+
+@{
+    ViewData["Title"] = "Создание тарифа";
+}
+
+<div class="container mt-4">
+    <!-- Заголовок страницы -->
+    <h2 class="fw-bold mb-4" style="color: var(--miku-dark);">Создание тарифного плана</h2>
+
+    <!-- Основная карточка формы -->
+    <div class="miku-card p-5">
+        <form asp-action="Create" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+            <div class="row g-4">
+                <!-- Выбор сервиса -->
+                <div class="col-md-6">
+                    <label asp-for="ServiceId" class="form-label fw-bold">Выберите сервис</label>
+                    <select asp-for="ServiceId" class="form-select border-0 bg-light rounded-pill px-4"
+                            asp-items="ViewBag.Services" style="height: 50px;">
+                        <option value="">-- Выберите сервис из каталога --</option>
+                    </select>
+                    <span asp-validation-for="ServiceId" class="text-danger small"></span>
+                </div>
+
+                <!-- Название тарифа -->
+                <div class="col-md-6">
+                    <label asp-for="PlanName" class="form-label fw-bold">Название тарифа</label>
+                    <input asp-for="PlanName" class="form-control border-0 bg-light rounded-pill px-4"
+                           placeholder="Например: Premium" style="height: 50px;" />
+                    <span asp-validation-for="PlanName" class="text-danger small"></span>
+                </div>
+
+                <!-- Стоимость -->
+                <div class="col-md-4">
+                    <label asp-for="Price" class="form-label fw-bold">Стоимость (руб)</label>
+                    <input asp-for="Price" type="number" class="form-control border-0 bg-light rounded-pill px-4"
+                           style="height: 50px;" />
+                    <span asp-validation-for="Price" class="text-danger small"></span>
+                </div>
+
+                <!-- Период -->
+                <div class="col-md-4">
+                    <label asp-for="BillingDays" class="form-label fw-bold">Период (дней)</label>
+                    <input asp-for="BillingDays" type="number" class="form-control border-0 bg-light rounded-pill px-4"
+                           value="30" style="height: 50px;" />
+                    <span asp-validation-for="BillingDays" class="text-danger small"></span>
+                </div>
+
+                <!-- Лимит пользователей -->
+                <div class="col-md-4">
+                    <label asp-for="MaxUsers" class="form-label fw-bold">Лимит пользователей</label>
+                    <input asp-for="MaxUsers" type="number" class="form-control border-0 bg-light rounded-pill px-4"
+                           value="1" style="height: 50px;" />
+                    <span asp-validation-for="MaxUsers" class="text-danger small"></span>
+                </div>
+            </div>
+
+            <!-- Кнопки управления -->
+            <div class="mt-5 d-flex gap-3">
+                <button type="submit" class="btn-miku border-0">Создать тариф</button>
+                <a asp-action="Index" class="btn-outline-dark-miku text-decoration-none d-flex align-items-center">Отмена</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

@@ -1,0 +1,51 @@
+﻿@model SubscriptionWeb.Models.Service
+
+@{
+    ViewData["Title"] = "Редактирование";
+}
+
+<div class="d-flex justify-content-center mt-4">
+    <div class="miku-card p-5" style="width: 100%; max-width: 600px;">
+        <h2 class="fw-bold mb-4" style="color: var(--miku-dark);">Редактировать сервис</h2>
+
+        <form asp-action="Edit" method="post">
+            <!-- Скрытое поле с ID обязательно! -->
+            <input type="hidden" asp-for="ServiceId" />
+
+            <div class="mb-3">
+                <label asp-for="Name" class="form-label fw-bold">Официальное название</label>
+                <input asp-for="Name" class="form-control rounded-pill px-3" />
+                <span asp-validation-for="Name" class="text-danger small"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Category" class="form-label fw-bold">Категория</label>
+                <input asp-for="Category" class="form-control rounded-pill px-3" />
+                <span asp-validation-for="Category" class="text-danger small"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Website" class="form-label fw-bold">URL-адрес сайта</label>
+                <input asp-for="Website" class="form-control rounded-pill px-3" />
+                <span asp-validation-for="Website" class="text-danger small"></span>
+            </div>
+
+            <div class="mb-4">
+                <label asp-for="Description" class="form-label fw-bold">Краткое описание</label>
+                <textarea asp-for="Description" class="form-control px-3" style="border-radius: 20px;" rows="3"></textarea>
+                <span asp-validation-for="Description" class="text-danger small"></span>
+            </div>
+
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn-miku flex-grow-1">Сохранить изменения</button>
+                <a asp-action="Index" class="btn-outline-dark-miku text-decoration-none text-center" style="min-width: 120px;">Отмена</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="SubscriptionWeb.Tests/SubscriptionWeb.Tests.csproj" Id="088d1504-7ec5-433e-af36-42b2b9141454" />
+  <Project Path="SubscriptionWeb/SubscriptionWeb.csproj" />
+</Solution>

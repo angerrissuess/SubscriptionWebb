@@ -1,0 +1,50 @@
+﻿@{
+    ViewData["Title"] = "Главная";
+}
+
+<!-- Hero Section -->
+<div class="container mt-5">
+    <div class="miku-card p-5 mb-5 text-center shadow-sm" style="background: linear-gradient(135deg, var(--miku-mint-light) 0%, #ffffff 100%); border: none;">
+        <h1 class="display-3 fw-bold mb-3" style="color: var(--miku-dark);">Управляй подписками <br> <span style="color: var(--miku-mint);">в один клик</span></h1>
+        <p class="fs-5 text-muted mb-5 mx-auto" style="max-width: 700px;">
+            Больше никаких забытых списаний. Контролируй все свои сервисы, тарифы и даты оплаты в одном сервисе.
+        </p>
+
+        <div class="d-flex gap-3 justify-content-center">
+            @if (User.Identity.IsAuthenticated)
+            {
+                <a asp-controller="Service" asp-action="Index" class="btn-miku px-5 py-3 text-decoration-none shadow">Перейти к сервисам</a>
+            }
+            else
+            {
+                <a asp-controller="Account" asp-action="Register" class="btn-miku px-5 py-3 text-decoration-none shadow">Начать бесплатно</a>
+                <a asp-controller="Account" asp-action="Login" class="btn-outline-dark-miku px-5 py-3 text-decoration-none">У меня есть аккаунт</a>
+            }
+        </div>
+    </div>
+
+    <!-- Features Section -->
+    <div class="row g-4 mb-5 text-center">
+        <div class="col-md-4">
+            <div class="miku-card p-4 h-100 border-0 shadow-sm">
+                <div class="fs-1 mb-3">📊</div>
+                <h4 class="fw-bold" style="color: var(--miku-dark);">Удобный учет</h4>
+                <p class="text-muted small">Добавляй любые сервисы: от Spotify до облачных хостингов.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="miku-card p-4 h-100 border-0 shadow-sm">
+                <div class="fs-1 mb-3">📅</div>
+                <h4 class="fw-bold" style="color: var(--miku-dark);">Умные даты</h4>
+                <p class="text-muted small">Автоматический расчет дней до окончания подписки в твоем профиле.</p>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="miku-card p-4 h-100 border-0 shadow-sm">
+                <div class="fs-1 mb-3">🎨</div>
+                <h4 class="fw-bold" style="color: var(--miku-dark);">Приятный интерфейс</h4>
+                <p class="text-muted small">Минималистичный и приятный интерфейс.</p>
+            </div>
+        </div>
+    </div>
+</div>

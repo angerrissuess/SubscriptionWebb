@@ -1,0 +1,22 @@
+﻿@{
+    ViewData["Title"] = "Вход";
+}
+
+<div class="d-flex justify-content-center align-items-center" style="min-height: 70vh;">
+    <div class="miku-card p-5" style="width: 100%; max-width: 450px;">
+        <h2 class="fw-bold mb-4 text-center">Log in</h2>
+        <div asp-validation-summary="ModelOnly" class="text-danger small mb-3 text-center"></div>
+        <form asp-action="Login" method="post">
+            <div class="mb-3">
+                <label class="form-label fw-bold">Email</label>
+                <input name="email" type="email" class="form-control rounded-pill px-3" placeholder="miku@example.com" required />
+            </div>
+            <div class="mb-4">
+                <label class="form-label fw-bold">Пароль</label>
+                <input name="password" type="password" class="form-control rounded-pill px-3" placeholder="••••••••" required />
+            </div>
+            <button type="submit" class="btn-miku w-100 mb-3">Войти</button>
+            <p class="text-center small">Нет аккаунта? <a asp-action="Register" class="text-decoration-none fw-bold" style="color: var(--miku-pink);">Sign up</a></p>
+        </form>
+    </div>
+</div>

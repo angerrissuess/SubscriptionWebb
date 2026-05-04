@@ -1,0 +1,103 @@
+﻿@model SubscriptionWeb.Models.User
+@{
+    ViewData["Title"] = "Регистрация";
+}
+
+<style>
+    /* Стилизация кнопки "Обзор" внутри инпута файла */
+    .form-control::file-selector-button {
+        background-color: var(--miku-mint, #4db6ac);
+        color: white;
+        border: none;
+        border-radius: 50px;
+        padding: 0.2rem 1rem;
+        margin-right: 1rem;
+        cursor: pointer;
+        transition: background-color 0.2s;
+    }
+
+        .form-control::file-selector-button:hover {
+            background-color: var(--miku-dark, #00897b);
+        }
+
+    /* Контейнер для пароля с иконкой */
+    .password-container {
+        position: relative;
+    }
+
+    .password-toggle {
+        position: absolute;
+        right: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        cursor: pointer;
+        color: #888;
+        user-select: none;
+    }
+</style>
+
+<div class="d-flex justify-content-center align-items-center" style="min-height: 70vh;">
+    <div class="miku-card p-5" style="width: 100%; max-width: 450px;">
+        <h2 class="fw-bold mb-4 text-center" style="color: var(--miku-dark);">Регистрация</h2>
+
+        <form asp-action="Register" method="post" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="text-danger small mb-3"></div>
+
+            <div class="mb-3">
+                <label class="form-label fw-bold">имя профиля</label>
+                <input asp-for="FullName" class="form-control rounded-pill px-3" placeholder="angerr" />
+                <span asp-validation-for="FullName" class="text-danger small"></span>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label fw-bold">Email</label>
+                <input asp-for="Email" class="form-control rounded-pill px-3" placeholder="miku@example.com" />
+                <span asp-validation-for="Email" class="text-danger small"></span>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label fw-bold">Пароль</label>
+                <div class="password-container">
+                    <input asp-for="Password" type="password" id="passInput" class="form-control rounded-pill px-3" placeholder="••••••••" />
+                    <span class="password-toggle" onclick="togglePasswordVisibility()">👁️</span>
+                </div>
+                <span asp-validation-for="Password" class="text-danger small"></span>
+            </div>
+
+            <div class="mb-4">
+                <label class="form-label fw-bold">Фото профиля</label>
+                <!-- Стилизованный через CSS инпут -->
+                <input type="file" name="avatarFile" class="form-control rounded-pill px-3" accept="image/*" />
+                <small class="text-muted d-block mt-1 ms-2">Необязательно</small>
+            </div>
+
+            <button type="submit" class="btn-miku w-100 mb-3">Создать аккаунт</button>
+
+            <p class="text-center small">
+                Уже есть аккаунт?
+                <a asp-action="Login" class="text-decoration-none fw-bold" style="color: var(--miku-mint);">Войти</a>
+            </p>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        function togglePasswordVisibility() {
+            const passInput = document.getElementById('passInput');
+            const toggleIcon = event.target;
+
+            if (passInput.type === 'password') {
+                passInput.type = 'text';
+                toggleIcon.textContent = '🔒'; 
+            } else {
+                passInput.type = 'password';
+                toggleIcon.textContent = '👁️';
+            }
+        }
+    </script>
+}
