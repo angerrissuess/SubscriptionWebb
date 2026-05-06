@@ -6,6 +6,9 @@ using Microsoft.EntityFrameworkCore;
 using SubscriptionWeb.Data;
 using SubscriptionWeb.Models;
 using System.Security.Claims;
+using System.Security.Cryptography;
+using System.Linq;
+using System;
 
 namespace SubscriptionWeb.Controllers
 {
@@ -22,6 +25,7 @@ namespace SubscriptionWeb.Controllers
         public IActionResult Register() => View();
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Register(User model, IFormFile? avatarFile)
         {
             if (ModelState.IsValid)
@@ -37,8 +41,19 @@ namespace SubscriptionWeb.Controllers
                 // Логика сохранения аватара при регистрации
                 if (avatarFile != null && avatarFile.Length > 0)
                 {
-                    model.AvatarPath = await SaveAvatar(avatarFile);
+                    try
+                    {
+                        model.AvatarPath = await SaveAvatar(avatarFile);
+                    }
+                    catch (Exception ex)
+                    {
+                        ModelState.AddModelError("Avatar", ex.Message);
+                        return View(model);
+                    }
                 }
+
+                // Хешируем пароль перед сохранением (PBKDF2)
+                model.Password = HashPassword(model.Password);
 
                 _context.Users.Add(model);
                 await _context.SaveChangesAsync();
@@ -74,6 +89,7 @@ namespace SubscriptionWeb.Controllers
 
         [Authorize]
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> UpdateAvatar(IFormFile avatarFile)
         {
             var userId = GetUserId(); // Используем твой вспомогательный метод
@@ -89,7 +105,16 @@ namespace SubscriptionWeb.Controllers
                 }
 
                 // 2. Сохраняем новую картинку (используем твой метод SaveAvatar)
-                user.AvatarPath = await SaveAvatar(avatarFile);
+                try
+                {
+                    user.AvatarPath = await SaveAvatar(avatarFile);
+                }
+                catch (Exception ex)
+                {
+                    // Сохраняем сообщение об ошибке и возвращаемся в профиль
+                    TempData["AvatarError"] = ex.Message;
+                    return RedirectToAction("Profile");
+                }
 
                 // 3. Сохраняем изменения в БД
                 await _context.SaveChangesAsync();
@@ -108,11 +133,12 @@ namespace SubscriptionWeb.Controllers
         public IActionResult Login() => View();
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(string email, string password)
         {
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email && u.Password == password);
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
 
-            if (user != null)
+            if (user != null && VerifyPassword(password, user.Password))
             {
                 await Authenticate(user);
                 return RedirectToAction("Index", "Service");
@@ -148,12 +174,25 @@ namespace SubscriptionWeb.Controllers
 
         private int GetUserId()
         {
-            return int.Parse(User.FindFirst("UserId")?.Value ?? "0");
+            var claim = User.FindFirst("UserId");
+            if (claim == null || !int.TryParse(claim.Value, out var userId))
+                throw new UnauthorizedAccessException("Пользователь не авторизован");
+            return userId;
         }
 
         // Вынес логику сохранения файла в отдельный метод, чтобы не дублировать код
         private async Task<string> SaveAvatar(IFormFile file)
         {
+            // Ограничения
+            const long maxFileSize = 5 * 1024 * 1024; // 5 MB
+            var allowedTypes = new[] { "image/jpeg", "image/png", "image/gif", "image/webp" };
+
+            if (file.Length <= 0 || file.Length > maxFileSize)
+                throw new InvalidOperationException("Файл слишком большой или пустой (макс. 5MB)");
+
+            if (!allowedTypes.Contains(file.ContentType))
+                throw new InvalidOperationException("Недопустимый тип файла. Разрешены только изображения.");
+
             var folderPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/uploads/avatars");
 
             // Создаем папку, если её нет
@@ -168,6 +207,36 @@ namespace SubscriptionWeb.Controllers
             }
 
             return "/uploads/avatars/" + fileName;
+        }
+
+        // --- Простая реализация PBKDF2 для хеширования паролей ---
+        private static string HashPassword(string password)
+        {
+            const int iterations = 100000;
+            var salt = RandomNumberGenerator.GetBytes(16);
+            using var derive = new Rfc2898DeriveBytes(password, salt, iterations, HashAlgorithmName.SHA256);
+            var hash = derive.GetBytes(32);
+            return $"{iterations}.{Convert.ToBase64String(salt)}.{Convert.ToBase64String(hash)}";
+        }
+
+        private static bool VerifyPassword(string password, string storedHash)
+        {
+            try
+            {
+                var parts = storedHash.Split('.');
+                if (parts.Length != 3) return false;
+                var iterations = int.Parse(parts[0]);
+                var salt = Convert.FromBase64String(parts[1]);
+                var hash = Convert.FromBase64String(parts[2]);
+
+                using var derive = new Rfc2898DeriveBytes(password, salt, iterations, HashAlgorithmName.SHA256);
+                var computed = derive.GetBytes(hash.Length);
+                return CryptographicOperations.FixedTimeEquals(computed, hash);
+            }
+            catch
+            {
+                return false;
+            }
         }
         #endregion
     }

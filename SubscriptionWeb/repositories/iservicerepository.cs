@@ -10,7 +10,8 @@ namespace SubscriptionWeb.Repositories
         Task AddAsync(Service service);
 
         // Поиск и удаление теперь тоже требуют проверки владельца
-        Task<Service> GetByIdAsync(int id, int userId);
+        // Возвращаем nullable, т.к. запись может не существовать или не принадлежать пользователю
+        Task<Service?> GetByIdAsync(int id, int userId);
 
         Task UpdateAsync(Service service);
 

@@ -8,6 +8,9 @@ var builder = WebApplication.CreateBuilder(args);
 
 // 2. ЗАТЕМ добавляем в него все настройки
 builder.Services.AddControllersWithViews();
+// Антифрод и логирование
+builder.Services.AddAntiforgery();
+builder.Services.AddLogging();
 
 // Настраиваем куки (авторизацию)
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)

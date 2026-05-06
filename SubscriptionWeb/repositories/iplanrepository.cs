@@ -8,7 +8,8 @@ namespace SubscriptionWeb.Repositories
         Task<IEnumerable<Plan>> GetAllAsync(int userId);
 
         // Поиск с проверкой владельца[cite: 8]
-        Task<Plan> GetByIdAsync(int id, int userId);
+        // Возвращаем nullable: план может отсутствовать или принадлежать другому пользователю
+        Task<Plan?> GetByIdAsync(int id, int userId);
 
         Task AddAsync(Plan plan);
         Task UpdateAsync(Plan plan);

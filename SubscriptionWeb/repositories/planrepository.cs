@@ -21,7 +21,7 @@ namespace SubscriptionWeb.Repositories
                     .ToListAsync();
         }
 
-        public async Task<Plan> GetByIdAsync(int id, int userId)
+        public async Task<Plan?> GetByIdAsync(int id, int userId)
         {
             // Ищем план по ID, проверяя, что он принадлежит текущему пользователю
             return await _context.Plans

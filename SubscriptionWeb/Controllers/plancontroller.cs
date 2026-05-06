@@ -22,7 +22,9 @@ namespace SubscriptionWeb.Controllers
         private int GetCurrentUserId()
         {
             var claim = User.FindFirst("UserId");
-            return claim != null ? int.Parse(claim.Value) : 0;
+            if (claim == null || !int.TryParse(claim.Value, out var userId))
+                throw new UnauthorizedAccessException("Пользователь не авторизован");
+            return userId;
         }
 
         public async Task<IActionResult> Index()
@@ -41,6 +43,7 @@ namespace SubscriptionWeb.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Plan plan)
         {
             plan.UserId = GetCurrentUserId();
@@ -78,6 +81,7 @@ namespace SubscriptionWeb.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(Plan plan)
         {
             plan.UserId = GetCurrentUserId();
@@ -99,8 +103,15 @@ namespace SubscriptionWeb.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(int id)
         {
+            var plan = await _planRepository.GetByIdAsync(id, GetCurrentUserId());
+            if (plan == null)
+            {
+                return NotFound();
+            }
+
             await _planRepository.DeleteAsync(id, GetCurrentUserId());
             return RedirectToAction(nameof(Index));
         }

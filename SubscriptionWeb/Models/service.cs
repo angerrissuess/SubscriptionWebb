@@ -14,13 +14,15 @@ namespace SubscriptionWeb.Models
         public string Category { get; set; } = string.Empty;
 
         [Url(ErrorMessage = "Введите корректный URL-адрес сайта")]
-        public string Website { get; set; } 
+        [Display(Name = "Вебсайт")]
+        public string Website { get; set; } = string.Empty;
 
-        public string Description { get; set; } 
+        public string? Description { get; set; }
 
-        public ICollection<Plan> Plans { get; set; } 
+        // Инициализируем коллекцию, чтобы не получить NRE при обращении
+        public ICollection<Plan> Plans { get; set; } = new List<Plan>();
         
-        public int? UserId { get; set; } 
-        public User User { get; set; } 
+        public int? UserId { get; set; }
+        public User? User { get; set; }
     }
 }

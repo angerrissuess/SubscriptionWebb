@@ -21,7 +21,9 @@ namespace SubscriptionWeb.Controllers
         private int GetCurrentUserId()
         {
             var claim = User.FindFirst("UserId");
-            return claim != null ? int.Parse(claim.Value) : 0;
+            if (claim == null || !int.TryParse(claim.Value, out var userId))
+                throw new UnauthorizedAccessException("Пользователь не авторизован");
+            return userId;
         }
 
         public async Task<IActionResult> Index()
@@ -37,6 +39,7 @@ namespace SubscriptionWeb.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Service model)
         {
             // Принудительно привязываем новый сервис к текущему пользователю
@@ -65,6 +68,7 @@ namespace SubscriptionWeb.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(Service model)
         {
             model.UserId = GetCurrentUserId();
@@ -80,9 +84,13 @@ namespace SubscriptionWeb.Controllers
         }
 
         [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete(int id)
         {
-            // Удаляем только если ID сервиса и ID юзера совпали в базе
+            // Проверяем существование и владельца
+            var service = await _repository.GetByIdAsync(id, GetCurrentUserId());
+            if (service == null) return NotFound();
+
             await _repository.DeleteAsync(id, GetCurrentUserId());
             return RedirectToAction("Index");
         }

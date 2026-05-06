@@ -9,6 +9,7 @@
         <h2 class="fw-bold mb-4" style="color: var(--miku-dark);">Редактировать тариф</h2>
 
         <form asp-action="Edit" method="post">
+            @Html.AntiForgeryToken()
             <!-- КРИТИЧЕСКИ ВАЖНО: Скрытые поля для сохранения данных -->
             <input type="hidden" asp-for="PlanId" />
             <input type="hidden" asp-for="UserId" />
