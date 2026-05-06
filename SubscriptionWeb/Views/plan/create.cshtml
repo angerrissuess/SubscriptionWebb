@@ -5,10 +5,8 @@
 }
 
 <div class="container mt-4">
-    <!-- Заголовок страницы -->
     <h2 class="fw-bold mb-4" style="color: var(--miku-dark);">Создание тарифного плана</h2>
 
-    <!-- Основная карточка формы -->
     <div class="miku-card p-5">
         <form asp-action="Create" method="post">
             <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
@@ -32,27 +30,42 @@
                     <span asp-validation-for="PlanName" class="text-danger small"></span>
                 </div>
 
-                <!-- Стоимость -->
+                <!-- Стоимость (защита от букв) -->
                 <div class="col-md-4">
                     <label asp-for="Price" class="form-label fw-bold">Стоимость (руб)</label>
-                    <input asp-for="Price" type="number" class="form-control border-0 bg-light rounded-pill px-4"
+                    <input asp-for="Price"
+                           type="text"
+                           inputmode="decimal"
+                           oninput="validateDecimal(this)"
+                           class="form-control border-0 bg-light rounded-pill px-4"
+                           placeholder="0.00"
                            style="height: 50px;" />
                     <span asp-validation-for="Price" class="text-danger small"></span>
                 </div>
 
-                <!-- Период -->
+                <!-- Период (только целые числа) -->
                 <div class="col-md-4">
                     <label asp-for="BillingDays" class="form-label fw-bold">Период (дней)</label>
-                    <input asp-for="BillingDays" type="number" class="form-control border-0 bg-light rounded-pill px-4"
-                           value="30" style="height: 50px;" />
+                    <input asp-for="BillingDays"
+                           type="text"
+                           inputmode="numeric"
+                           oninput="validateInteger(this)"
+                           class="form-control border-0 bg-light rounded-pill px-4"
+                           value="30"
+                           style="height: 50px;" />
                     <span asp-validation-for="BillingDays" class="text-danger small"></span>
                 </div>
 
-                <!-- Лимит пользователей -->
+                <!-- Лимит пользователей (только целые числа) -->
                 <div class="col-md-4">
                     <label asp-for="MaxUsers" class="form-label fw-bold">Лимит пользователей</label>
-                    <input asp-for="MaxUsers" type="number" class="form-control border-0 bg-light rounded-pill px-4"
-                           value="1" style="height: 50px;" />
+                    <input asp-for="MaxUsers"
+                           type="text"
+                           inputmode="numeric"
+                           oninput="validateInteger(this)"
+                           class="form-control border-0 bg-light rounded-pill px-4"
+                           value="1"
+                           style="height: 50px;" />
                     <span asp-validation-for="MaxUsers" class="text-danger small"></span>
                 </div>
             </div>
@@ -70,4 +83,21 @@
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
+
+    <script>
+        // Функция для дробных чисел (стоимость)
+        function validateDecimal(input) {
+            
+            input.value = input.value.replace(/[^0-9.]/g, '');
+            if ((input.value.match(/\./g) || []).length > 1) {
+                input.value = input.value.replace(/\.+$/, "");
+            }
+        }
+
+        // Функция для целых чисел (дни и пользователи)
+        function validateInteger(input) {
+            // Разрешаем только цифры
+            input.value = input.value.replace(/[^0-9]/g, '');
+        }
+    </script>
 }
